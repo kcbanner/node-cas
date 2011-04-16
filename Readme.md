@@ -11,6 +11,29 @@ via npm:
 
 ## Usage
 
+Setup:
+
+    var CAS = require('cas');
+    var cas = new CAS({base_url: 'https://cas.uwaterloo.ca/cas', service: 'my_service'});
+
+Using it in a login route:
+
+    exports.cas_login = function(req, res) {
+      var ticket = req.param('ticket');
+      if (ticket) {
+        cas.validate(ticket, function(err, status, username) {
+          if (err) {
+            // Handle the error
+            res.send({error: err});
+          } else {
+            // Log the user in
+            res.send({status: status, username: username});
+          }
+        });
+      } else {
+        res.redirect('/');
+      }
+    };
 
 ## License 
 
