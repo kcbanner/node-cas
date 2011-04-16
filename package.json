@@ -1,5 +1,5 @@
 {
-  "name": "node-cas",
+  "name": "cas",
   "version": "0.0.1",
   "description": "Central Authentication Service (CAS) client for Node.js",
   "keywords": ["cas", "central authentication service", "auth", "authentication", "central", "service"],

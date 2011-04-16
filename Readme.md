@@ -3,6 +3,16 @@
 
   Central Authentication Service (CAS) client for Node.js
 
+## Installation
+
+via npm:
+
+    $ npm install node-cas
+
+## Usage
+
+
+
 ## License 
 
 (The MIT License)
