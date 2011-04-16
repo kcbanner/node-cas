@@ -1,5 +1,5 @@
 
-# node-cas
+# cas
 
   Central Authentication Service (CAS) client for Node.js
 
@@ -7,10 +7,9 @@
 
 via npm:
 
-    $ npm install node-cas
+    $ npm install cas
 
 ## Usage
-
 
 
 ## License 

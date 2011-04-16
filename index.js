@@ -1,2 +1,2 @@
 
-module.exports = require('./lib/node-cas');
+module.exports = require('./lib/cas');
