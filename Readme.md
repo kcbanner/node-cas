@@ -3,6 +3,10 @@
 
   Central Authentication Service (CAS) client for Node.js
 
+  This module only handles the ticket validation step of the CAS login process. Planned features include functions to generate the login/logout URLs.
+
+  Generally, to start the login process, send your users to: `https://cas_base_url/login?service=url_to_handle_ticket_validation`. In the University of Waterloo example below, this url would be: `https://cas.uwaterloo.ca/cas/login?service='my_service'`.
+
 ## Installation
 
 via npm:
