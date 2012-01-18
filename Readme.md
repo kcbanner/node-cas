@@ -3,9 +3,11 @@
 
   Central Authentication Service (CAS) client for Node.js
 
-  This module only handles the ticket validation step of the CAS login process. Planned features include functions to generate the login/logout URLs.
+  This module only handles the ticket validation step of the CAS login process, as well as functions for transparently authenticating or redirecting as needed. CAS attributes are also supported. Planned features include support for CAS proxy tickets and single sign-out.
 
-  Generally, to start the login process, send your users to: `https://cas_base_url/login?service=url_to_handle_ticket_validation`. In the University of Waterloo example below, this url would be: `https://cas.uwaterloo.ca/cas/login?service='my_service'`.
+  To start the login process manually, send your users to: `https://cas_base_url/login?service=url_to_handle_ticket_validation`. In the University of Waterloo example below, this url would be: `https://cas.uwaterloo.ca/cas/login?service='my_service'`.
+  
+  Or if you are using standard HTTP req/res objects for a web page, you may use the provided `authenticate()` function to handle the redirection automatically.
 
 ## Installation
 
@@ -18,7 +20,11 @@ via npm:
 Setup:
 
     var CAS = require('cas');
-    var cas = new CAS({base_url: 'https://cas.uwaterloo.ca/cas', service: 'my_service'});
+    var cas = new CAS({
+        base_url: 'https://cas.uwaterloo.ca/cas', 
+        service: 'my_service',
+        version: 2.0
+    });
 
 Using it in a login route:
 
@@ -38,6 +44,20 @@ Using it in a login route:
         res.redirect('/');
       }
     };
+
+Using the auto redirect authentication:
+
+    exports.cas_login = function(req, res) {
+      cas.authenticate(req, res, function(err, status, username, attributes) {
+        if (err) {
+          // Handle the error
+          res.send({error: err});
+        } else {
+          // Log the user in
+          res.send({status: status, username: username, attributes: attributes});
+        }
+      });    
+    }
 
 ## License 
 
