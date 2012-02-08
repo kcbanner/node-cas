@@ -3,11 +3,15 @@
 
   Central Authentication Service (CAS) client for Node.js
 
-  This module only handles the ticket validation step of the CAS login process, as well as functions for transparently authenticating or redirecting as needed. CAS attributes are also supported. Planned features include support for CAS proxy tickets and single sign-out.
-
+  This module handles CAS authentication (with support for proxies and extended attributes), and can also transparently redirect a web page if needed. The ticket validation step is available as its own function for those who wish to handle things manually. Proxied requests can be made through a function call, or optionally through an HTTP request with custom headers. Planned features include support for single sign-out.
+  
   To start the login process manually, send your users to: `https://cas_base_url/login?service=url_to_handle_ticket_validation`. In the University of Waterloo example below, this url would be: `https://cas.uwaterloo.ca/cas/login?service='my_service'`.
   
   Or if you are using standard HTTP req/res objects for a web page, you may use the provided `authenticate()` function to handle the redirection automatically.
+  
+  It is also possible to use this as a standalone CAS proxy server.
+  
+  
 
 ## Installation
 
@@ -48,16 +52,105 @@ Using it in a login route:
 Using the auto redirect authentication:
 
     exports.cas_login = function(req, res) {
-      cas.authenticate(req, res, function(err, status, username, attributes) {
+      cas.authenticate(req, res, function(err, status, username, extended) {
         if (err) {
           // Handle the error
           res.send({error: err});
         } else {
-          // Log the user in
-          res.send({status: status, username: username, attributes: attributes});
+          // Log the user in 
+          res.send({status: status, username: username, attributes: extended.attributes});
         }
       });    
     }
+
+Longer example with CAS proxy:
+
+    var fs = require('fs');
+    var http = require('http');
+
+    // Initialize CAS
+    var CAS = require('cas');
+    var cas = new CAS({
+        base_url: 'https://cas.uwaterloo.ca/cas',
+        version: 2.0,
+        
+        proxy_server: true,
+        proxy_server_port: 0, // disable inbound external proxy connections
+        proxy_server_key: fs.readFileSync('/path/to/private_key.pem'),
+        proxy_server_cert: fs.readFileSync('/path/to/ssl_cert.pem'),
+        
+        // CAS server will connect to this. It must be accessible on the
+        // public internet.
+        proxy_callback_host: 'my-public-domain.example.com',
+        proxy_callback_port: 8989
+    });
+    
+    // Main web server
+    var server = http.createServer();
+    server.addListener('request', function(req, res) {
+
+        var ip = req.connection.remoteAddress
+             || req.socket.remoteAddress 
+             || req.connection.socket.remoteAddress;
+        
+        cas.authenticate(req, res, function(err, status, username, extended) {
+            if (err) {
+                res.end(err.message);
+                return;
+            }
+            
+            // At this point the user has been authenticated. In a real web
+            // framework you would want to use sessions to track the info.
+            
+            res.writeHead(200, {'Content-Type': 'text/html'});
+            res.write('<div style="border:solid 1px black; padding:1em; margin:1em;">');
+            res.write('<p>Welcome ' + username + '. Your IP address is ' + ip + '.</p>');
+            res.write('<p>You are here: <b>http://' + req.headers.host + req.url + '</b></p>');
+            
+            // CAS server should return a PGTIOU since we specified a proxy
+            var pgtIOU = extended['PGTIOU'];
+            if (pgtIOU) {
+                res.write('<p>');
+                res.write('Your PGTIOU for this session is: ' + pgtIOU + '<br/>');
+                res.write('Your web framework should keep track of this if it wants to use CAS proxied services on your behalf.<br/>');
+                res.write('</p>');
+            
+                // For testing the proxy function at "/proxyDirect"
+                if (req.url.match(/proxyDirect/)) {
+                    res.write('Starting direct proxy request...<br/>');
+                    
+                    // Fetch http://localhost:8080/test through the proxy on user's behalf
+                    cas.proxiedRequest(pgtIOU, {
+                        protocol: 'http:',
+                        method: 'GET',
+                        hostname: 'localhost',
+                        port: 8080,
+                        pathname: '/test'
+                    }, function(err, proxyReq, proxyRes) {
+                        // Just display the proxied results directly
+                        proxyRes.on('data', function(chunk) {
+                            res.write(chunk);
+                        });
+                        proxyRes.on('end', function() {
+                            res.write('Proxy Done<br/>');
+                            res.write('</div>');
+                            res.end();
+                        });
+                    });
+                    
+                    return;
+                } // end of "/proxyDirect"
+            }
+            
+            // Normal requests, such as to "/test"
+            res.write('Done<br/>');
+            res.write('</div>');
+            res.end();
+        
+        });
+        
+    });
+    server.listen(8080);
 
 ## License 
 
