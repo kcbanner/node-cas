@@ -3,7 +3,7 @@
 
   Central Authentication Service (CAS) client for Node.js
 
-  This module handles CAS authentication (with support for proxies and extended attributes), and can also transparently redirect a web page if needed. The ticket validation step is available as its own function for those who wish to handle things manually. Proxied requests can be made through a function call, or optionally through an HTTP request with custom headers. Planned features include support for single sign-out.
+  This module handles CAS authentication (with support for proxies and extended attributes), and can also transparently redirect a web page if needed. The ticket validation step is available as its own function for those who wish to handle things manually. Proxied requests can be made through a function call, or optionally through an HTTP request with custom headers. Single sign out is also supported with Express/Connect.
   
   To start the login process manually, send your users to: `https://cas_base_url/login?service=url_to_handle_ticket_validation`. In the University of Waterloo example below, this url would be: `https://cas.uwaterloo.ca/cas/login?service='my_service'`.
   

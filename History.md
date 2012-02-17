@@ -1,17 +1,17 @@
 
-0.0.4 / 2012-02-07
+0.0.4 / 2012-02-17
 ==================
 
   * Support for CAS 2.0 features
       - CAS extended attributes
       - CAS proxies
       
-        . using built-in PGT callback and proxy servers
-        . can make proxied requests with proxiedRequest()
-        
-        . can authenticate using external proxy server
+        . provides built-in PGT callback and proxy servers
+        . can make proxied requests with internal proxy server
         . can act as a standalone external proxy server for others
+        . can make proxied requests with external proxy server
         
+  * single sign out support
   * auto redirect with authenticate()
   * logout
 
