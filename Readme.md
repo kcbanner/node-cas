@@ -1,4 +1,3 @@
-
 # cas
 
   Central Authentication Service (CAS) client for Node.js
@@ -23,15 +22,18 @@ via npm:
 
 Setup:
 
+```javascript
     var CAS = require('cas');
     var cas = new CAS({
         base_url: 'https://cas.uwaterloo.ca/cas', 
         service: 'my_service',
         version: 2.0
     });
+```
 
 Using it in a login route:
 
+```javascript
     exports.cas_login = function(req, res) {
       var ticket = req.param('ticket');
       if (ticket) {
@@ -48,9 +50,11 @@ Using it in a login route:
         res.redirect('/');
       }
     };
+```
 
 Using the auto redirect authentication:
 
+```javascript
     exports.cas_login = function(req, res) {
       cas.authenticate(req, res, function(err, status, username, extended) {
         if (err) {
@@ -62,9 +66,11 @@ Using the auto redirect authentication:
         }
       });    
     }
+```
 
-Longer example with CAS proxy:
+Longer example with CAS proxy (also see the [wiki](https://github.com/joshchan/node-cas/wiki/CAS-Proxy)):
 
+```javascript
     var fs = require('fs');
     var http = require('http');
 
@@ -151,6 +157,7 @@ Longer example with CAS proxy:
         
     });
     server.listen(8080);
+```
 
 ## License 
 
