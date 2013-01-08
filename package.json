@@ -1,10 +1,32 @@
 {
   "name": "hpu-cas",
-  "version": "0.0.3",
+  "version": "0.0.1",
   "description": "Central Authentication Service (CAS) client for Node.js",
-  "keywords": ["cas", "central authentication service", "auth", "authentication", "central", "service"],
+  "keywords": [
+    "cas",
+    "central authentication service",
+    "auth",
+    "authentication",
+    "central",
+    "service"
+  ],
   "author": "Truong Hoang Dung <checkraiser11@gmail.com>",
   "dependencies": {},
   "main": "index",
-  "engines": { "node": "0.4 || 0.5 || 0.6 || 0.8" }
+  "engines": {
+    "node": "0.4 || 0.5 || 0.6 || 0.8"
+  },
+  "readmeFilename": "Readme.md",
+  "gitHead": "ae1074442cc456bb0c7b33a60535891ed8d1a62f",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/checkraiser/node-cas"
+  },
+  "license": "BSD"
 }
