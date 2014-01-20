@@ -5,8 +5,6 @@
 
   This module only handles the ticket validation step of the CAS login process. Planned features include functions to generate the login/logout URLs.
 
-  Generally, to start the login process, send your users to: `https://cas_base_url/login?service=url_to_handle_ticket_validation`. In the University of Waterloo example below, this url would be: `https://cas.uwaterloo.ca/cas/login?service='my_service'`.
-
 ## Installation
 
 via npm:
@@ -18,20 +16,20 @@ via npm:
 Setup:
 
     var CAS = require('cas');
-    var cas = new CAS({base_url: 'https://cas.uwaterloo.ca/cas', service: 'my_service'});
+    var cas = new CAS({base_url: 'https://cas.uwaterloo.ca/cas', service: 'http://localhost:8087/result/'});
 
 Using it in a login route:
 
     exports.cas_login = function(req, res) {
       var ticket = req.param('ticket');
       if (ticket) {
-        cas.validate(ticket, function(err, status, username) {
+        cas.validate(ticket, function(err, status, response) {
           if (err) {
             // Handle the error
             res.send({error: err});
           } else {
             // Log the user in
-            res.send({status: status, username: username});
+            res.send({status: status, response: response});
           }
         });
       } else {
