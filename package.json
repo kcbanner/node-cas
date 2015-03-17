@@ -8,7 +8,7 @@
     { "name": "Joshua Chan", "email": "other.joshua@gmail.com" }
   ],
   "dependencies": {
-    "jsdom": "= 3.1.x"
+    "jsdom": "3.1.x"
   },
   "main": "index",
   "engines": { "node": "0.4 || 0.5 || 0.6" }
