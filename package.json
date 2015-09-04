@@ -1,15 +1,14 @@
 {
   "name": "cas",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Central Authentication Service (CAS) client for Node.js",
   "keywords": ["cas", "central authentication service", "auth", "authentication", "central", "service"],
   "author": "Casey Banner <kcbanner@gmail.com>",
   "contributors": [
-    { "name": "Joshua Chan", "email": "other.joshua@gmail.com" }
+    { "name": "Joshua Chan", "email": "joshua@appdevdesigns.net" }
   ],
   "dependencies": {
     "jsdom": "3.1.x"
   },
-  "main": "index",
-  "engines": { "node": "0.4 || 0.5 || 0.6" }
+  "main": "index"
 }
