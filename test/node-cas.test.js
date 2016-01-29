@@ -48,7 +48,7 @@ module.exports = {
         };
         var logoutCallback = function (result) {
             // Assert
-            ticket.should.equal(result, 'should return valid ticket');
+            should.equal(result, ticket, 'should return valid ticket');
         };
 
         // Action
@@ -127,24 +127,24 @@ module.exports = {
             one.should.equal(true);
 
             should.exist(username, 'should have username');
-            user.should.equal(username, 'should return valid username');
+            should.equal(username, user, 'should return valid username');
 
             should.exist(ticketInfo, 'should have ticketInfo');
 
             should.exist(ticketInfo.username, 'should have username property');
-            user.should.equal(ticketInfo.username, 'should have username');
+            should.equal(ticketInfo.username, user, 'should have username');
 
             should.exist(ticketInfo.attributes, 'should have attributes property');
-            attributes.should.deepEqual(ticketInfo.attributes, 'should have attributes');
+            should.deepEqual(ticketInfo.attributes, attributes, 'should have attributes');
 
             should.exist(ticketInfo.PGTIOU, 'should have PGTIOU property');
-            proxyGrantingTicket.should.equal(ticketInfo.PGTIOU, 'should have PGTIOU property');
+            should.equal(ticketInfo.PGTIOU, proxyGrantingTicket, 'should have PGTIOU property');
 
             should.exist(ticketInfo.ticket, 'should have ticket property');
-            ticket.should.equal(ticketInfo.ticket, 'should return valid ticket property');
+            should.equal(ticketInfo.ticket, ticket, 'should return valid ticket property');
 
             should.exist(ticketInfo.proxies, 'should have proxies property');
-            proxies.should.deepEqual(ticketInfo.proxies, 'should return valid proxies');
+            should.deepEqual(ticketInfo.proxies, proxies, 'should return valid proxies');
         };
 
         // Action
@@ -171,6 +171,12 @@ module.exports = {
             // Assert
             should.exist(err, 'should return a error');
             should.equal(err.message, 'No username?', 'should return no username error message');
+            
+            should.exist(one, 'should return');
+            should.equal(one, false, 'should return false');
+            
+            should.not.exist(username, 'should not return username');
+            should.not.exist(ticketInfo, 'should not return ticket info');
          };
 
         // Action
@@ -192,6 +198,10 @@ module.exports = {
             // Assert
             should.exist(err, 'should return a error');
             should.equal(err.message, 'Bad response format.', 'should return bad request error message');
+            
+            should.not.exist(one, 'should not return');
+            should.not.exist(username, 'should not return username');
+            should.not.exist(ticketInfo, 'should not return ticket info');
          };
 
         // Action
@@ -225,7 +235,7 @@ module.exports = {
             should.not.exist(err, 'should not have any errors');
 
             should.exist(returnProxyTicket, 'should have proxy ticket');
-            proxyTicket.should.equal(returnProxyTicket, 'should return valid proxy ticket');
+            should.equal(returnProxyTicket, proxyTicket, 'should return valid proxy ticket');
         };
 
         // Action
@@ -258,7 +268,39 @@ module.exports = {
         var callback = function(err, returnProxyTicket) {
             // Assert
             should.exist(err, 'should have a error');
-            err.message.should.equal('Proxy failure [' + errorCode + ']: ' + errorMessage, 'should return valid error message');
+            should.equal(err.message, 'Proxy failure [' + errorCode + ']: ' + errorMessage, 'should return valid error message');
+            
+            should.not.exist(returnProxyTicket, 'should not return any tickets');
+        };
+
+        // Action
+        cas.getProxyTicket(pgtIOU, service, callback);
+    },
+    
+    
+    'getProxyTicket - should return bad request when server return invalid data': function() {
+        // Assign
+        var pgtID = 'TEST pgtID';
+        var pgtIOU = 'TEST pgtIOU';
+
+        cas.pgtStore[pgtIOU] = {
+            'pgtID': pgtID,
+            'time': process.uptime()
+        };
+
+        var invalidResponse = 'INVALID RESPONSE DATA';
+
+        // Mock up response
+        nock(base_url)
+            .get('/proxy')
+            .query({ targetService: service, pgt: pgtID })
+            .reply(200, invalidResponse);
+                        
+        var callback = function(err, returnProxyTicket) {
+            // Assert
+            should.exist(err, 'should have a error');
+            console.log(err.message);
+            should.equal(err.message, "Bad response format: " + invalidResponse, 'should return bad request error message');
             
             should.not.exist(returnProxyTicket, 'should not return any tickets');
         };
