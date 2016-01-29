@@ -10,5 +10,13 @@
   "dependencies": {
     "jsdom": "3.1.x"
   },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "nock": "^7.0.2",
+    "should": "^8.2.1"
+  },
+  "scripts": {
+    "test": "make test"
+  },
   "main": "index"
 }
