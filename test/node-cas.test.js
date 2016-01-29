@@ -56,10 +56,36 @@ module.exports = {
     },
 
 
+    'handleSingleSignout - should call next method when get invalid request': function() {
+        // Assign
+        var req = {
+            method: 'POST',
+            body: {
+                logoutRequest: 'INVALID REQUEST'
+            },
+            connection: {
+                remoteAddress: sso_servers[0]
+            }
+        };
+        var res = {};
+        var next = function () {
+            // Assert
+            should.exist(true, 'should call this function');
+        };
+        var logoutCallback = function (result) {
+            // Assert
+            should.not.exist(result, 'should not return any tickets');
+        };
+
+        // Action
+        cas.handleSingleSignout(req, res, next, logoutCallback);
+    },
+
+
     'validate - should return valid ticket information': function () {
         // Assign
-        var ticket = "TICKET";
-        var user = "USERNAME";
+        var ticket = "TEST TICKET";
+        var user = "TEST USERNAME";
         var attributes = {
             attrastyle: ['RubyCAS'],
             surname: ['Smith'],
@@ -120,6 +146,53 @@ module.exports = {
             should.exist(ticketInfo.proxies, 'should have proxies property');
             proxies.should.deepEqual(ticketInfo.proxies, 'should return valid proxies');
         };
+
+        // Action
+        cas.validate(ticket, callback, service, null);
+    },
+
+
+    'validate - should return error when server does not return user info': function () {
+        // Assign
+        var ticket = "TEST TICKET";
+
+         // Mock up response 
+        nock(base_url)
+            .get('/proxyValidate')
+            .query({ ticket: ticket, service: service })
+            .reply(200,
+                '<cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">' +
+                    '<cas:authenticationSuccess>' +
+                        '<cas:proxyGrantingTicket>TEST PROXY GRANTING TICKET</cas:proxyGrantingTicket>' +
+                    '</cas:authenticationSuccess>' +
+                '</cas:serviceResponse>');
+
+         var callback = function (err, one, username, ticketInfo) {
+            // Assert
+            should.exist(err, 'should return a error');
+            should.equal(err.message, 'No username?', 'should return no username error message');
+         };
+
+        // Action
+        cas.validate(ticket, callback, service, null);
+    },
+
+
+    'validate - should return error when server does not return invalid info': function () {
+        // Assign
+        var ticket = "TEST TICKET";
+
+         // Mock up response 
+        nock(base_url)
+            .get('/proxyValidate')
+            .query({ ticket: ticket, service: service })
+            .reply(200, 'INVALID RESPONSE DATA');
+
+         var callback = function (err, one, username, ticketInfo) {
+            // Assert
+            should.exist(err, 'should return a error');
+            should.equal(err.message, 'Bad response format.', 'should return bad request error message');
+         };
 
         // Action
         cas.validate(ticket, callback, service, null);
