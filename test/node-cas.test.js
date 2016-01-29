@@ -7,6 +7,7 @@ var CAS = require('../lib/cas')
     , should = require('should')
     , nock = require('nock');
 
+// Initial server infomation
 var base_url = 'https://localhost/cas',
     service = 'test_service',
     sso_servers = ['test_remote_address'],
@@ -24,6 +25,7 @@ module.exports = {
 
 
     'handleSingleSignout - should return valid ticket in callback': function () {
+        // Assign
         var ticket = 'TICKET';
 
         var req = {
@@ -41,17 +43,21 @@ module.exports = {
         };
         var res = {};
         var next = function () {
+            // Assert
             should.not.exist(true, 'should not call this function');
         };
         var logoutCallback = function (result) {
+            // Assert
             ticket.should.equal(result, 'should return valid ticket');
         };
 
+        // Action
         cas.handleSingleSignout(req, res, next, logoutCallback);
     },
 
 
     'validate - should return valid ticket information': function () {
+        // Assign
         var ticket = "TICKET";
         var user = "USERNAME";
         var attributes = {
@@ -74,6 +80,7 @@ module.exports = {
             proxiesTag += '<cas:proxies>' + proxy + '</cas:proxies>';
         });
 
+        // Mock up response 
         nock(base_url)
             .get('/proxyValidate')
             .query({ ticket: ticket, service: service })
@@ -88,6 +95,7 @@ module.exports = {
                 '</cas:serviceResponse>');
 
         var callback = function (err, one, username, ticketInfo) {
+            // Assert
             should.not.exist(err, 'should not have any errors');
 
             one.should.equal(true);
@@ -113,11 +121,13 @@ module.exports = {
             proxies.should.deepEqual(ticketInfo.proxies, 'should return valid proxies');
         };
 
+        // Action
         cas.validate(ticket, callback, service, null);
     },
 
 
     'getProxyTicket - should return valid proxy ticket': function () {
+        // Assign
         var proxyTicket = 'TEST proxyTicket';
         var pgtID = 'TEST pgtID';
         var pgtIOU = 'TEST pgtIOU';
@@ -127,6 +137,7 @@ module.exports = {
             'time': process.uptime()
         };
 
+        // Mock up response 
         nock(base_url)
             .get('/proxy')
             .query({ targetService: service, pgt: pgtID })
@@ -137,16 +148,19 @@ module.exports = {
                         '</cas:serviceResponse>');
 
         var callback = function (err, returnProxyTicket) {
+            // Assert
             should.not.exist(err, 'should not have any errors');
 
             should.exist(returnProxyTicket, 'should have proxy ticket');
             proxyTicket.should.equal(returnProxyTicket, 'should return valid proxy ticket');
         };
 
+        // Action
         cas.getProxyTicket(pgtIOU, service, callback);
     },
     
     'getProxyTicket - should return proxy failure error': function () {
+        // Assign
         var pgtID = 'TEST pgtID';
         var pgtIOU = 'TEST pgtIOU';
 
@@ -158,6 +172,7 @@ module.exports = {
         var errorCode = 500;
         var errorMessage = 'TEST Error message';
 
+        // Mock up response
         nock(base_url)
             .get('/proxy')
             .query({ targetService: service, pgt: pgtID })
@@ -168,12 +183,14 @@ module.exports = {
                         '</cas:serviceResponse>');
                         
         var callback = function(err, returnProxyTicket) {
+            // Assert
             should.exist(err, 'should have a error');
             err.message.should.equal('Proxy failure [' + errorCode + ']: ' + errorMessage, 'should return valid error message');
             
             should.not.exist(returnProxyTicket, 'should not return any tickets');
         };
 
+        // Action
         cas.getProxyTicket(pgtIOU, service, callback);
     }
 
